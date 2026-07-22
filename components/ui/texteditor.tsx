@@ -102,7 +102,7 @@ export function TextEditor({
             onContentChange(file.id, e.target.value)
           }}
           spellCheck={false}
-          className="absolute inset-2 m-0 resize-none overflow-auto border-0 p-0 font-k2d text-lg leading-7 whitespace-pre outline-none"
+          className="absolute inset-2 m-0 resize-none scrollbar-thin overflow-auto border-0 p-0 font-k2d text-lg leading-7 whitespace-pre outline-none"
         />
       </div>
     </div>
