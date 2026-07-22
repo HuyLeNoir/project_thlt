@@ -23,6 +23,7 @@ import { OpenedFile, SearchOption, FileSearchResult } from "@/lib/definitions"
 import { appendFiles } from "@/lib/utilities"
 import { cn } from "@/lib/utils"
 import { RegReplace, RegexSearch, escapeRegex } from "@/lib/regexEngine"
+import { EmptyOutline } from "@/components/emptyTextEditor"
 export const mockOpenedFiles: OpenedFile[] = [
   {
     id: "App.tsx-1718000000000",
@@ -459,7 +460,9 @@ export default function Page() {
         </div>
         {/* TextEditor */}
         {files.length == 0 ? (
-          <div className="text-center">Trống</div>
+          <div className="flex min-h-0 w-full flex-1">
+            <EmptyOutline onUpload={handleUpload} />
+          </div>
         ) : (
           <Tabs
             defaultValue={activeTab}
