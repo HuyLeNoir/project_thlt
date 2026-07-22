@@ -227,16 +227,16 @@ export default function Page() {
         <div className="flex flex-row gap-2.5 px-2.5">
           {/* Menu */}
           <div className="flex w-full flex-row border-t border-b py-1">
+            <input
+              type="file"
+              accept=".txt"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              multiple
+              className="hidden"
+            />
             <Button variant={"ghost"} onClick={handleUpload} size={"icon-lg"}>
               <File data-icon="inline-start" />
-              <input
-                type="file"
-                accept=".txt"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                multiple
-                className="hidden"
-              />
             </Button>
             <Button onClick={handleSaveFile} variant={"ghost"} size={"icon-lg"}>
               <Save data-icon="inline-start" />
@@ -406,7 +406,7 @@ export default function Page() {
                                   )}
                                 >
                                   <Badge variant={"outline"}>
-                                    Dòng {match.line}
+                                    {match.line}
                                   </Badge>
                                   {match.text}
                                 </div>
