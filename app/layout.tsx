@@ -1,16 +1,13 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Inter, K2D } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-
-const inter = Inter({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+import { cn } from "@/lib/utils"
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+const k2d = K2D({
   subsets: ["latin"],
-  variable: "--font-mono",
+  weight: ["400", "700"],
+  variable: "--font-k2d",
 })
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,10 +17,10 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
+      className={cn("antialiased", "font-sans", inter.variable, k2d.variable)}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <div>{children}</div>
       </body>
     </html>
   )
