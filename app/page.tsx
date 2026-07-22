@@ -56,17 +56,11 @@ export default function Page() {
     } catch (err: any) {
       setError(err.message)
     }
-  }, [searchOption, files])
+  }, [searchOption, files, target])
+
   function handleTargetChange(e: React.ChangeEvent<HTMLInputElement>) {
     const target = e.target.value
     setTarget(target)
-    try {
-      const result = RegexSearch(searchOption, target, files)
-      setRegexSearchResult(result)
-      setError("") // Reset lỗi cũ nếu tìm thành công
-    } catch (err: any) {
-      setError(err.message)
-    }
   }
   function handleReplace() {
     const currentFile = files.find((file) => file.id == activeTab)
@@ -77,6 +71,8 @@ export default function Page() {
       replaceTarget,
       currentFile?.content || ""
     )
+    const result = RegexSearch(searchOption, target, files)
+    setRegexSearchResult(result)
     setFiles((prevFiles) =>
       prevFiles.map((file) =>
         file.id === activeTab
@@ -113,6 +109,7 @@ export default function Page() {
   }
 
   async function handleFileChange(event: any) {
+    if (!event.target.files || event.target.files.length === 0) return
     const updatedFiles = await appendFiles(event.target.files, files)
     setFiles(updatedFiles) // Cập nhật state với danh sách file đã được append
     setActiveTab(updatedFiles[0].id)
@@ -264,7 +261,7 @@ export default function Page() {
                   type="text"
                   value={target}
                   onChange={handleTargetChange}
-                  className="w-full px-2 text-sm outline-none"
+                  className="w-full text-sm outline-none"
                   placeholder="Search"
                 />
                 {/* Search option */}
@@ -344,7 +341,7 @@ export default function Page() {
               {/* result */}
 
               {target && (
-                <div className="mt-2.5 flex min-h-0 max-w-full flex-1 flex-col border-t py-2">
+                <div className="mt-2.5 flex min-h-0 max-w-full flex-1 flex-col border-t px-2 py-2">
                   <p className="py-2 text-sm font-bold text-muted-foreground">
                     Kết quả tìm kiếm
                   </p>
@@ -408,7 +405,9 @@ export default function Page() {
                                     "flex w-full cursor-pointer items-center gap-2.5 py-2 hover:bg-muted"
                                   )}
                                 >
-                                  <Badge>Dòng {match.line}</Badge>
+                                  <Badge variant={"outline"}>
+                                    Dòng {match.line}
+                                  </Badge>
                                   {match.text}
                                 </div>
                               ))}
@@ -432,7 +431,7 @@ export default function Page() {
               defaultValue={activeTab}
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex min-h-0 w-full flex-1 flex-col gap-0"
+              className="flex min-h-0 w-full flex-1 flex-col gap-0 border-l"
             >
               {/* Tab head */}
               <TabsList className={"ml-15 p-0"}>
@@ -468,27 +467,30 @@ export default function Page() {
                 ))}
               </TabsList>
 
-              {files.map((file) => (
-                <TabsContent
-                  key={file.id}
-                  value={file.id}
-                  className="m-0 overflow-hidden p-0"
-                >
-                  <TextEditor
-                    jumpRequest={jumpRequest}
-                    file={file}
-                    onContentChange={handleContentChange}
-                    searchOption={searchOption}
-                    target={target}
-                    renderHighlightedContent={renderHighlightedContent}
-                    jumpToLine={
-                      jumpLocation?.fileId === file.id
-                        ? jumpLocation.line
-                        : null
-                    }
-                  ></TextEditor>
-                </TabsContent>
-              ))}
+              {files.map(
+                (file) =>
+                  file.id == activeTab && (
+                    <TabsContent
+                      key={file.id}
+                      value={file.id}
+                      className="m-0 overflow-hidden p-0"
+                    >
+                      <TextEditor
+                        jumpRequest={jumpRequest}
+                        file={file}
+                        onContentChange={handleContentChange}
+                        searchOption={searchOption}
+                        target={target}
+                        renderHighlightedContent={renderHighlightedContent}
+                        jumpToLine={
+                          jumpLocation?.fileId === file.id
+                            ? jumpLocation.line
+                            : null
+                        }
+                      ></TextEditor>
+                    </TabsContent>
+                  )
+              )}
             </Tabs>
           )}
         </div>

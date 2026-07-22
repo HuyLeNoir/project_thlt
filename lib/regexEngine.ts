@@ -58,42 +58,52 @@ export function RegexSearch(
     const fileMatches: MatchItem[] = []
 
     lines.forEach((lineText, index) => {
-      if (regex.test(lineText)) {
-        const parts = lineText.split(regex)
-
-        // 💡 Dùng React.createElement để tạo JSX Element trong file .ts
-        const children: React.ReactNode[] = []
-
-        parts.forEach((part, pIdx) => {
-          if (!part) return
-          if (pIdx % 2 === 1) {
-            children.push(
-              React.createElement(
-                "mark",
-                {
-                  key: pIdx,
-                  className: "inline-block rounded-sm bg-amber-300 px-0.5",
-                },
-                part
-              )
-            )
-          } else {
-            // Phần tử chỉ số CHẴN (0, 2, 4...) là text thường
-            children.push(part)
-          }
-        })
-
+      // const parts = lineText.split(regex)
+      let match: RegExpExecArray | null
+      while ((match = regex.exec(lineText)) !== null) {
+        //match tu biet cach nhảy index qua match kế tiep
+        const matchIndex = match.index // Vị trí bắt đầu của match này
+        const matchLength = match[0].length // Độ dài của chuỗi khớp
+        const before = lineText.slice(Math.max(0, matchIndex - 10), matchIndex)
+        const matchedText = match[0]
+        const after = lineText.slice(matchIndex + matchLength)
+        //add vao accordion voi moi match
         const highlightedText = React.createElement(
           "p",
-          { className: "truncate font-mono text-slate-700" },
-          ...children
+          { className: "truncate text-xs" },
+          before,
+          React.createElement(
+            "mark",
+            {
+              key: "active-mark",
+              className: "rounded-xs bg-amber-300 px-0.5",
+            },
+            matchedText
+          ),
+          after
         )
-
         fileMatches.push({
           line: index + 1,
           text: highlightedText, // Khớp với interface MatchItem
         })
       }
+      // parts.forEach((part, pIdx) => {
+      //   if (!part) return
+      //   if (pIdx % 2 === 1) {
+      //     children.push(
+      //       React.createElement(
+      //         "mark",
+      //         {
+      //           key: pIdx,
+      //           className: "inline-block rounded-sm bg-amber-300 px-0.5",
+      //         },
+      //         part
+      //       )
+      //     )
+      //   } else {
+      //     children.push(part)
+      //   }
+      // })
     })
 
     if (fileMatches.length > 0) {
