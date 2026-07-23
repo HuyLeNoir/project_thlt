@@ -1,5 +1,6 @@
 "use client"
 import React from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -245,174 +246,183 @@ export default function Page() {
           </ButtonWithTooltip>
         </div>
         <div className="flex min-h-0 w-full flex-1 flex-row gap-2.5">
-          {isSearching && (
-            <div className="flex h-full min-w-[20%] flex-col">
-              {/* Search */}
-              <div className="flex rounded-sm border px-2 py-1 focus-within:outline-2 focus-within:outline-primary focus-within:outline-solid">
-                <input
-                  type="text"
-                  value={target}
-                  onChange={handleTargetChange}
-                  className="w-full text-sm outline-none"
-                  placeholder="Search"
-                />
-                {/* Search option */}
-                <div className="flex gap-1">
-                  <Button
-                    onClick={() => {
-                      setSearchOption({
-                        ...searchOption,
-                        isCaseSensitive: !searchOption.isCaseSensitive,
-                      })
-                    }}
-                    variant={
-                      searchOption.isCaseSensitive ? "default" : "outline"
-                    }
-                    size={"icon-sm"}
-                  >
-                    <CaseSensitive />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setSearchOption({
-                        ...searchOption,
-                        isWholeWord: !searchOption.isWholeWord,
-                      })
-                    }}
-                    variant={searchOption.isWholeWord ? "default" : "outline"}
-                    size={"icon-sm"}
-                  >
-                    <WholeWord />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setSearchOption({
-                        ...searchOption,
-                        isRegex: !searchOption.isRegex,
-                      })
-                    }}
-                    variant={searchOption.isRegex ? "default" : "outline"}
+          {/* Sidebar */}
+          <AnimatePresence>
+            {isSearching && (
+              <motion.div
+                initial={{ x: "-100%", width: 0, opacity: 0 }}
+                animate={{ x: 0, width: "20%", opacity: 1 }}
+                exit={{ x: "-100%", width: 0, opacity: 0 }}
+                transition={{ ease: "easeOut", duration: 0.2 }}
+                className="flex h-full min-w-0 flex-col"
+              >
+                {/* Search */}
+                <div className="flex rounded-sm border px-2 py-1 focus-within:outline-2 focus-within:outline-primary focus-within:outline-solid">
+                  <input
+                    type="text"
+                    value={target}
+                    onChange={handleTargetChange}
+                    className="w-full text-sm outline-none"
+                    placeholder="Search"
+                  />
+                  {/* Search option */}
+                  <div className="flex gap-1">
+                    <Button
+                      onClick={() => {
+                        setSearchOption({
+                          ...searchOption,
+                          isCaseSensitive: !searchOption.isCaseSensitive,
+                        })
+                      }}
+                      variant={
+                        searchOption.isCaseSensitive ? "default" : "outline"
+                      }
+                      size={"icon-sm"}
+                    >
+                      <CaseSensitive />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setSearchOption({
+                          ...searchOption,
+                          isWholeWord: !searchOption.isWholeWord,
+                        })
+                      }}
+                      variant={searchOption.isWholeWord ? "default" : "outline"}
+                      size={"icon-sm"}
+                    >
+                      <WholeWord />
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setSearchOption({
+                          ...searchOption,
+                          isRegex: !searchOption.isRegex,
+                        })
+                      }}
+                      variant={searchOption.isRegex ? "default" : "outline"}
 
-                    size={"icon-sm"}
-                  >
-                    <Regex />
-                  </Button>
-                </div>
-              </div>
-              {error && (
-                <p className="mt-1 text-xs text-destructive">{error}</p>
-              )}
-              {/* Replace */}
-
-              <div className="flex items-center gap-1 py-1">
-                <input
-                  value={replaceTarget}
-                  onChange={(e) => {
-                    setReplaceTarget(e.target.value)
-                  }}
-                  type="text"
-                  className="w-full rounded-sm border px-2 py-2.5 text-sm focus:outline-primary"
-                  placeholder="Replace"
-                />
-
-                <Button
-                  onClick={handleReplace}
-                  variant={"outline"}
-                  size={"icon-lg"}
-                >
-                  <Replace />
-                </Button>
-                <Button
-                  onClick={handleReplaceAll}
-                  variant={"outline"}
-                  size={"icon-lg"}
-                >
-                  <ReplaceAll />
-                </Button>
-              </div>
-              {/* result */}
-
-              {target && (
-                <div className="mt-2.5 flex min-h-0 max-w-full flex-1 flex-col border-t px-2 py-2">
-                  <p className="py-2 text-sm font-bold text-muted-foreground">
-                    Kết quả tìm kiếm
-                  </p>
-                  {/* Result */}
-                  {/* ACcordion */}
-                  <div className="flex h-full min-h-0 flex-1 scrollbar-thin flex-col gap-0.5 overflow-y-auto">
-                    {/* Accordion item*/}
-
-                    {regexSearchResult.length === 0 ? (
-                      <div className="flex w-full justify-center py-5">
-                        Kết quả tìm kiếm rỗng
-                      </div>
-                    ) : (
-                      regexSearchResult.map((item, index) => (
-                        <div key={index}>
-                          {/* ACcordion Trigger */}
-                          <div
-                            onClick={() => {
-                              setIsOpen((prev) => ({
-                                ...prev,
-                                [index]: !prev[index],
-                              }))
-                            }}
-                            className={cn(
-                              "flex w-full items-center justify-between rounded-lg p-2 hover:bg-emerald-50",
-                              isOpen[index] ? "" : "shadow-sm"
-                            )}
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <FileText
-                                className="text-primary"
-                                size={18}
-                              ></FileText>
-                              <p>{item.fileName}</p>
-                            </div>
-                            <div className="flex items-center gap-2.5">
-                              <Badge>{item.matchCount} kết quả khớp</Badge>
-                              <ChevronDown
-                                className={cn(
-                                  "h-4 w-4 text-slate-400 transition-transform duration-200 data-[state=closed]:-rotate-90"
-                                )}
-                                data-state={isOpen[index] ? "open" : "closed"}
-                              />
-                            </div>
-                          </div>
-                          {/* Accordion content */}
-                          {isOpen[index] && (
-                            <div className="flex flex-col items-start gap-1.5">
-                              {item.matches.map((match, match_index) => (
-                                <div
-                                  key={match_index}
-                                  onClick={() => {
-                                    setActiveTab(item.fileId)
-                                    setJumpLocation({
-                                      fileId: item.fileId,
-                                      line: match.line,
-                                    })
-                                    setJumpRequest((value) => value + 1)
-                                  }}
-                                  className={cn(
-                                    "flex w-full cursor-pointer items-center gap-2.5 py-2 hover:bg-muted"
-                                  )}
-                                >
-                                  <Badge variant={"outline"}>
-                                    {match.line}
-                                  </Badge>
-                                  {match.text}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
+                      size={"icon-sm"}
+                    >
+                      <Regex />
+                    </Button>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+                {error && (
+                  <p className="mt-1 text-xs text-destructive">{error}</p>
+                )}
+                {/* Replace */}
+
+                <div className="flex items-center gap-1 py-1">
+                  <input
+                    value={replaceTarget}
+                    onChange={(e) => {
+                      setReplaceTarget(e.target.value)
+                    }}
+                    type="text"
+                    className="w-full rounded-sm border px-2 py-2.5 text-sm focus:outline-primary"
+                    placeholder="Replace"
+                  />
+
+                  <Button
+                    onClick={handleReplace}
+                    variant={"outline"}
+                    size={"icon-lg"}
+                  >
+                    <Replace />
+                  </Button>
+                  <Button
+                    onClick={handleReplaceAll}
+                    variant={"outline"}
+                    size={"icon-lg"}
+                  >
+                    <ReplaceAll />
+                  </Button>
+                </div>
+                {/* result */}
+
+                {target && (
+                  <div className="mt-2.5 flex min-h-0 max-w-full flex-1 flex-col border-t px-2 py-2">
+                    <p className="py-2 text-sm font-bold text-muted-foreground">
+                      Kết quả tìm kiếm
+                    </p>
+                    {/* Result */}
+                    {/* ACcordion */}
+                    <div className="flex h-full min-h-0 flex-1 scrollbar-thin flex-col gap-0.5 overflow-y-auto">
+                      {/* Accordion item*/}
+
+                      {regexSearchResult.length === 0 ? (
+                        <div className="flex w-full justify-center py-5">
+                          Kết quả tìm kiếm rỗng
+                        </div>
+                      ) : (
+                        regexSearchResult.map((item, index) => (
+                          <div key={index}>
+                            {/* ACcordion Trigger */}
+                            <div
+                              onClick={() => {
+                                setIsOpen((prev) => ({
+                                  ...prev,
+                                  [index]: !prev[index],
+                                }))
+                              }}
+                              className={cn(
+                                "flex w-full items-center justify-between rounded-lg p-2 hover:bg-emerald-50",
+                                isOpen[index] ? "" : "shadow-sm"
+                              )}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <FileText
+                                  className="text-primary"
+                                  size={18}
+                                ></FileText>
+                                <p>{item.fileName}</p>
+                              </div>
+                              <div className="flex items-center gap-2.5">
+                                <Badge>{item.matchCount} kết quả khớp</Badge>
+                                <ChevronDown
+                                  className={cn(
+                                    "h-4 w-4 text-slate-400 transition-transform duration-200 data-[state=closed]:-rotate-90"
+                                  )}
+                                  data-state={isOpen[index] ? "open" : "closed"}
+                                />
+                              </div>
+                            </div>
+                            {/* Accordion content */}
+                            {isOpen[index] && (
+                              <div className="flex flex-col items-start gap-1.5">
+                                {item.matches.map((match, match_index) => (
+                                  <div
+                                    key={match_index}
+                                    onClick={() => {
+                                      setActiveTab(item.fileId)
+                                      setJumpLocation({
+                                        fileId: item.fileId,
+                                        line: match.line,
+                                      })
+                                      setJumpRequest((value) => value + 1)
+                                    }}
+                                    className={cn(
+                                      "flex w-full cursor-pointer items-center gap-2.5 py-2 hover:bg-muted"
+                                    )}
+                                  >
+                                    <Badge variant={"outline"}>
+                                      {match.line}
+                                    </Badge>
+                                    {match.text}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
           {/* TextEditor */}
           {files.length == 0 ? (
             <div className="flex min-h-0 w-full flex-1">
@@ -423,16 +433,16 @@ export default function Page() {
               defaultValue={activeTab}
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex min-h-0 w-full flex-1 flex-col gap-0 border-l"
+              className="flex min-h-0 w-full flex-1 flex-col gap-0"
             >
               {/* Tab head */}
-              <div className="ml-15 w-full min-w-0 scrollbar-thin overflow-x-auto">
-                <TabsList className="inline-flex h-auto w-max flex-nowrap justify-start p-0">
+              <div className="w-full min-w-0 scrollbar-thin overflow-x-auto overflow-y-hidden rounded-t-md bg-gray-100">
+                <TabsList className="inline-flex h-auto w-max flex-nowrap justify-start bg-gray-100 p-0">
                   {files.map((file) => (
                     <TabsTrigger
                       key={file.id}
                       value={file.id}
-                      className="group min-w-40 shrink-0 justify-between py-0"
+                      className="group shrink-0 justify-between py-0 not-data-active:hover:bg-gray-200"
                     >
                       {file.isDirty && (
                         <span className="h-4 w-4 p-0">

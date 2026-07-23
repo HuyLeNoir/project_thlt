@@ -99,7 +99,7 @@ export function TextEditor({
       <div
         ref={lineNumbersRef}
         className={
-          "flex h-full w-15 flex-col items-end overflow-hidden p-2 font-k2d text-lg leading-7"
+          "flex h-full w-10 flex-col items-end overflow-hidden border-x bg-gray-50 p-2 font-k2d text-lg leading-7"
         }
       >
         {file.content.split("\n").map((_, i) => (
@@ -112,7 +112,7 @@ export function TextEditor({
           </div>
         ))}
       </div>
-      <div className="relative h-full w-full border-b bg-secondary p-2">
+      <div className="relative h-full w-full border-b bg-gray-50 p-2">
         <div
           ref={backdropRef}
           aria-hidden="true"
