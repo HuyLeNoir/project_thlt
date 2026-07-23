@@ -245,7 +245,7 @@ export default function Page() {
             <Search data-icon="inline-start" />
           </ButtonWithTooltip>
         </div>
-        <div className="flex min-h-0 w-full flex-1 flex-row gap-2.5">
+        <div className="flex min-h-0 w-full min-w-0 flex-1 flex-row gap-2.5">
           {/* Sidebar */}
           <AnimatePresence>
             {isSearching && (
@@ -254,7 +254,7 @@ export default function Page() {
                 animate={{ x: 0, width: "20%", opacity: 1 }}
                 exit={{ x: "-100%", width: 0, opacity: 0 }}
                 transition={{ ease: "easeOut", duration: 0.2 }}
-                className="flex h-full min-w-0 flex-col"
+                className="flex h-full w-[20%] flex-col"
               >
                 {/* Search */}
                 <div className="flex rounded-sm border px-2 py-1 focus-within:outline-2 focus-within:outline-primary focus-within:outline-solid">
@@ -433,7 +433,7 @@ export default function Page() {
               defaultValue={activeTab}
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex min-h-0 w-full flex-1 flex-col gap-0"
+              className="flex min-h-0 w-full min-w-0 flex-1 flex-col gap-0"
             >
               {/* Tab head */}
               <div className="w-full min-w-0 scrollbar-thin overflow-x-auto overflow-y-hidden rounded-t-md bg-gray-100">
