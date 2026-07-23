@@ -1,4 +1,5 @@
 import { Inter, K2D } from "next/font/google"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 import "./globals.css"
 import { cn } from "@/lib/utils"
@@ -19,9 +20,11 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("antialiased", "font-sans", inter.variable, k2d.variable)}
     >
-      <body>
-        <div>{children}</div>
-      </body>
+      <TooltipProvider>
+        <body>
+          <div>{children}</div>
+        </body>
+      </TooltipProvider>
     </html>
   )
 }

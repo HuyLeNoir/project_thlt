@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TextEditor } from "@/components/ui/texteditor"
+import { ButtonWithTooltip } from "@/components/ui/buttonWithTooltip"
+
 import {
   Search,
   File,
@@ -17,6 +19,7 @@ import {
   CaseSensitive,
   ChevronDown,
   WholeWord,
+  FolderOpen,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OpenedFile, SearchOption, FileSearchResult } from "@/lib/definitions"
@@ -42,13 +45,14 @@ export default function Page() {
   const [error, setError] = useState("")
   const [regexSearchResult, setRegexSearchResult] = useState<
     FileSearchResult[]
-  >([])
+  >([]) //sidebar search on all files
   const [jumpLocation, setJumpLocation] = useState<{
     fileId: string
     line: number
   } | null>(null)
 
   useEffect(() => {
+    //useEffect cap nhat lai sideBar
     try {
       const result = RegexSearch(searchOption, target, files)
       setRegexSearchResult(result)
@@ -159,6 +163,16 @@ export default function Page() {
       })
     )
   }
+  function handleNewFile() {
+    const newFile: OpenedFile = {
+      id: `${Date.now()}TextDocument${Math.random()}`,
+      fileName: "New txt document",
+      content: "",
+      isDirty: false,
+    }
+    setFiles((prevFiles) => [newFile, ...prevFiles])
+    setActiveTab(newFile.id)
+  }
   function handleCloseFile(e: any, fileId: string) {
     e.stopPropagation() // Ngăn trigger chuyển tab khi bấm icon X
 
@@ -171,35 +185,7 @@ export default function Page() {
       setActiveTab(nextActiveFile.id)
     }
   }
-  function renderHighlightedContent(
-    text: string,
-    keyword: string,
-    option: SearchOption
-  ) {
-    const contentToRender = text.endsWith("\n") ? text + "\n" : text
-    try {
-      const regex = getRegex(option, keyword)
-      const matchChecker = new RegExp(
-        regex.source,
-        regex.flags.replace(/g/, "")
-      ) //loai bo global flag de check local
-      const parts = contentToRender.split(regex)
-      return parts.map((part, index) => {
-        return matchChecker.test(part) ? (
-          <mark
-            key={index}
-            className="rounded-xs bg-amber-300 text-transparent"
-          >
-            {part}
-          </mark>
-        ) : (
-          <React.Fragment key={index}>{part}</React.Fragment>
-        )
-      })
-    } catch (error: any) {
-      return
-    }
-  }
+
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
       {/* Icon */}
@@ -211,39 +197,56 @@ export default function Page() {
         <p className="font-k2d text-lg font-bold">Project THLT</p>
       </div>
       {/* {BODY} */}
-      <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-3">
         {/* controlbar */}
-        <div className="flex flex-row gap-2.5 px-2.5">
-          {/* Menu */}
-          <div className="flex w-full flex-row border-t border-b py-1">
-            <input
-              type="file"
-              accept=".txt"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              multiple
-              className="hidden"
-            />
-            <Button variant={"ghost"} onClick={handleUpload} size={"icon-lg"}>
-              <File data-icon="inline-start" />
-            </Button>
-            <Button onClick={handleSaveFile} variant={"ghost"} size={"icon-lg"}>
-              <Save data-icon="inline-start" />
-            </Button>
-            <Button
-              onClick={() => {
-                setIsSearching(!isSearching)
-              }}
-              variant={"ghost"}
-              size={"icon-lg"}
-            >
-              <Search size={48} data-icon="inline-start" />
-            </Button>
-          </div>
+        {/* Menu */}
+        <div className="flex w-full flex-row border-t border-b px-2.5 py-1">
+          <input
+            type="file"
+            accept=".txt"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            multiple
+            className="hidden"
+          />
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-lg"
+            label="Tạo file"
+            onClick={handleNewFile}
+          >
+            <File data-icon="inline-start" />
+          </ButtonWithTooltip>
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-lg"
+            label="Mở file"
+            onClick={handleUpload}
+          >
+            <FolderOpen data-icon="inline-start" />
+          </ButtonWithTooltip>
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-lg"
+            label="Lưu file"
+            onClick={handleSaveFile}
+          >
+            <Save data-icon="inline-start" />
+          </ButtonWithTooltip>
+          <ButtonWithTooltip
+            variant="ghost"
+            size="icon-lg"
+            label="Tìm kiếm"
+            onClick={() => {
+              setIsSearching(!isSearching)
+            }}
+          >
+            <Search data-icon="inline-start" />
+          </ButtonWithTooltip>
         </div>
         <div className="flex min-h-0 w-full flex-1 flex-row gap-2.5">
           {isSearching && (
-            <div className="flex h-full w-75 flex-col">
+            <div className="flex h-full min-w-[20%] flex-col">
               {/* Search */}
               <div className="flex rounded-sm border px-2 py-1 focus-within:outline-2 focus-within:outline-primary focus-within:outline-solid">
                 <input
@@ -423,39 +426,40 @@ export default function Page() {
               className="flex min-h-0 w-full flex-1 flex-col gap-0 border-l"
             >
               {/* Tab head */}
-              <TabsList className={"ml-15 p-0"}>
-                {files.map((file) => (
-                  <TabsTrigger
-                    key={file.id}
-                    value={file.id}
-                    className={"group min-w-40 justify-between"}
-                  >
-                    {file.isDirty && (
-                      <span className="h-4 w-4 p-0">
-                        <Dot strokeWidth={10} />
-                      </span>
-                    )}
-                    <span className="flex-1 truncate text-left">
-                      {file.fileName}
-                    </span>
-                    <div
-                      className={cn(
-                        "hidden h-5 w-5 items-center justify-center rounded-full p-0 transition-all duration-100 ease-in group-hover:flex",
-                        activeTab != file.id
-                          ? "hover:bg-secondary hover:brightness-90"
-                          : "flex hover:bg-primary hover:brightness-90"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation() // Không kích hoạt chuyển tab
-                        handleCloseFile(e, file.id)
-                      }}
+              <div className="ml-15 w-full min-w-0 scrollbar-thin overflow-x-auto">
+                <TabsList className="inline-flex h-auto w-max flex-nowrap justify-start p-0">
+                  {files.map((file) => (
+                    <TabsTrigger
+                      key={file.id}
+                      value={file.id}
+                      className="group min-w-40 shrink-0 justify-between py-0"
                     >
-                      <X />
-                    </div>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
+                      {file.isDirty && (
+                        <span className="h-4 w-4 p-0">
+                          <Dot strokeWidth={10} />
+                        </span>
+                      )}
+                      <span className="flex-1 truncate text-left">
+                        {file.fileName}
+                      </span>
+                      <div
+                        className={cn(
+                          "invisible flex h-5 w-5 items-center justify-center rounded-full p-0 transition-all duration-100 ease-in group-hover:visible",
+                          activeTab != file.id
+                            ? "hover:bg-secondary hover:brightness-90"
+                            : "visible hover:bg-primary hover:brightness-90"
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation() // Không kích hoạt chuyển tab
+                          handleCloseFile(e, file.id)
+                        }}
+                      >
+                        <X />
+                      </div>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
               {files.map(
                 (file) =>
                   file.id == activeTab && (
@@ -470,7 +474,6 @@ export default function Page() {
                         onContentChange={handleContentChange}
                         searchOption={searchOption}
                         target={target}
-                        renderHighlightedContent={renderHighlightedContent}
                         jumpToLine={
                           jumpLocation?.fileId === file.id
                             ? jumpLocation.line

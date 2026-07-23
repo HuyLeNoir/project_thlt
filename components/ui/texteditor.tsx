@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react"
+import React from "react"
 import { OpenedFile, SearchOption } from "@/lib/definitions"
+import { getRegex } from "@/lib/regexEngine"
 interface CodeEditorTabProps {
   file: OpenedFile
   target: string
   searchOption: SearchOption
   onContentChange: (id: string, content: string) => void
-  renderHighlightedContent: Function
   jumpToLine: number | null
   jumpRequest: number
 }
@@ -15,14 +16,41 @@ export function TextEditor({
   target,
   searchOption,
   onContentChange,
-  renderHighlightedContent,
   jumpToLine,
   jumpRequest,
 }: CodeEditorTabProps) {
   const lineNumbersRef = useRef<HTMLDivElement>(null)
   const backdropRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
+  function renderHighlightedContent(
+    text: string,
+    keyword: string,
+    option: SearchOption
+  ) {
+    const contentToRender = text.endsWith("\n") ? text + "\n" : text
+    try {
+      const regex = getRegex(option, keyword)
+      const matchChecker = new RegExp(
+        regex.source,
+        regex.flags.replace(/g/, "")
+      ) //loai bo global flag de check local
+      const parts = contentToRender.split(regex)
+      return parts.map((part, index) => {
+        return matchChecker.test(part) ? (
+          <mark
+            key={index}
+            className="rounded-xs bg-amber-300 text-transparent"
+          >
+            {part}
+          </mark>
+        ) : (
+          <React.Fragment key={index}>{part}</React.Fragment>
+        )
+      })
+    } catch (error: any) {
+      return
+    }
+  }
   function syncScroll(scrollTop: number, scrollLeft: number) {
     const textarea = textareaRef.current
     const horizontalScrollbarHeight = textarea
@@ -39,7 +67,6 @@ export function TextEditor({
       backdropRef.current.style.paddingBottom = `${horizontalScrollbarHeight}px`
     }
   }
-
   function handleScroll(e: React.UIEvent<HTMLTextAreaElement>) {
     syncScroll(e.currentTarget.scrollTop, e.currentTarget.scrollLeft)
   }
