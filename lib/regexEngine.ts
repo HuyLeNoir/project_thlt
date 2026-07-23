@@ -87,23 +87,6 @@ export function RegexSearch(
           text: highlightedText, // Khớp với interface MatchItem
         })
       }
-      // parts.forEach((part, pIdx) => {
-      //   if (!part) return
-      //   if (pIdx % 2 === 1) {
-      //     children.push(
-      //       React.createElement(
-      //         "mark",
-      //         {
-      //           key: pIdx,
-      //           className: "inline-block rounded-sm bg-amber-300 px-0.5",
-      //         },
-      //         part
-      //       )
-      //     )
-      //   } else {
-      //     children.push(part)
-      //   }
-      // })
     })
 
     if (fileMatches.length > 0) {

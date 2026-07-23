@@ -22,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { OpenedFile, SearchOption, FileSearchResult } from "@/lib/definitions"
 import { appendFiles } from "@/lib/utilities"
 import { cn } from "@/lib/utils"
-import { RegReplace, RegexSearch, escapeRegex } from "@/lib/regexEngine"
+import { RegReplace, RegexSearch, getRegex } from "@/lib/regexEngine"
 import { EmptyOutline } from "@/components/emptyTextEditor"
 
 export default function Page() {
@@ -32,7 +32,7 @@ export default function Page() {
   const [replaceTarget, setReplaceTarget] = useState("")
   const [searchOption, setSearchOption] = useState<SearchOption>({
     isCaseSensitive: false,
-    isRegex: true,
+    isRegex: false,
     isWholeWord: false,
   })
   const [files, setFiles] = useState<OpenedFile[]>([])
@@ -71,8 +71,8 @@ export default function Page() {
       replaceTarget,
       currentFile?.content || ""
     )
-    const result = RegexSearch(searchOption, target, files)
-    setRegexSearchResult(result)
+    // const result = RegexSearch(searchOption, target, files)
+    // setRegexSearchResult(result)
     setFiles((prevFiles) =>
       prevFiles.map((file) =>
         file.id === activeTab
@@ -177,39 +177,28 @@ export default function Page() {
     option: SearchOption
   ) {
     const contentToRender = text.endsWith("\n") ? text + "\n" : text
-    if (!keyword || keyword.trim() === "") return contentToRender
-    let basePattern = option.isRegex ? keyword : escapeRegex(keyword)
-
-    if (option.isWholeWord) {
-      const startsWithWord = /^\w/.test(keyword) //lay ky tu dau tien cua keyword
-      const endsWithWord = /\w$/.test(keyword) //lay ky tu cuoi cung cua keyword
-
-      const left = startsWithWord ? "\\b" : "(?<=^|\\W)"
-      const right = endsWithWord ? "\\b" : "(?=$|\\W)"
-
-      basePattern = `${left}${basePattern}${right}`
-    }
-
-    let regex: RegExp
-    let matchChecker: RegExp
     try {
-      const flags = option.isCaseSensitive ? "g" : "gi"
-      const match_flags = option.isCaseSensitive ? "" : "i" //local match for render mark tag
-      regex = new RegExp(`(${basePattern})`, flags)
-      matchChecker = new RegExp(`^${basePattern}$`, match_flags)
+      const regex = getRegex(option, keyword)
+      const matchChecker = new RegExp(
+        regex.source,
+        regex.flags.replace(/g/, "")
+      ) //loai bo global flag de check local
+      const parts = contentToRender.split(regex)
+      return parts.map((part, index) => {
+        return matchChecker.test(part) ? (
+          <mark
+            key={index}
+            className="rounded-xs bg-amber-300 text-transparent"
+          >
+            {part}
+          </mark>
+        ) : (
+          <React.Fragment key={index}>{part}</React.Fragment>
+        )
+      })
     } catch (error: any) {
       return
     }
-    const parts = contentToRender.split(regex)
-    return parts.map((part, index) => {
-      return matchChecker.test(part) ? (
-        <mark key={index} className="rounded-xs bg-amber-300 text-transparent">
-          {part}
-        </mark>
-      ) : (
-        <React.Fragment key={index}>{part}</React.Fragment>
-      )
-    })
   }
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
