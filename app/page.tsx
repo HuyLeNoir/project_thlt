@@ -251,10 +251,10 @@ export default function Page() {
             {isSearching && (
               <motion.div
                 initial={{ x: "-100%", width: 0, opacity: 0 }}
-                animate={{ x: 0, width: "20%", opacity: 1 }}
+                animate={{ x: 0, width: "25%", opacity: 1 }}
                 exit={{ x: "-100%", width: 0, opacity: 0 }}
                 transition={{ ease: "easeOut", duration: 0.2 }}
-                className="flex h-full w-[20%] flex-col"
+                className="ml-2.5 flex h-full w-[25%] flex-col"
               >
                 {/* Search */}
                 <div className="flex rounded-sm border px-2 py-1 focus-within:outline-2 focus-within:outline-primary focus-within:outline-solid">
@@ -267,7 +267,8 @@ export default function Page() {
                   />
                   {/* Search option */}
                   <div className="flex gap-1">
-                    <Button
+                    <ButtonWithTooltip
+                      label="Phân biệt chữ hoa"
                       onClick={() => {
                         setSearchOption({
                           ...searchOption,
@@ -280,8 +281,9 @@ export default function Page() {
                       size={"icon-sm"}
                     >
                       <CaseSensitive />
-                    </Button>
-                    <Button
+                    </ButtonWithTooltip>
+                    <ButtonWithTooltip
+                      label="Toàn bộ từ"
                       onClick={() => {
                         setSearchOption({
                           ...searchOption,
@@ -292,8 +294,9 @@ export default function Page() {
                       size={"icon-sm"}
                     >
                       <WholeWord />
-                    </Button>
-                    <Button
+                    </ButtonWithTooltip>
+                    <ButtonWithTooltip
+                      label="Sử dụng biểu thức chính quy"
                       onClick={() => {
                         setSearchOption({
                           ...searchOption,
@@ -305,7 +308,7 @@ export default function Page() {
                       size={"icon-sm"}
                     >
                       <Regex />
-                    </Button>
+                    </ButtonWithTooltip>
                   </div>
                 </div>
                 {error && (
@@ -324,20 +327,22 @@ export default function Page() {
                     placeholder="Replace"
                   />
 
-                  <Button
+                  <ButtonWithTooltip
+                    label="Thay thế"
                     onClick={handleReplace}
                     variant={"outline"}
                     size={"icon-lg"}
                   >
                     <Replace />
-                  </Button>
-                  <Button
+                  </ButtonWithTooltip>
+                  <ButtonWithTooltip
+                    label="Thay thế toàn bộ"
                     onClick={handleReplaceAll}
                     variant={"outline"}
                     size={"icon-lg"}
                   >
                     <ReplaceAll />
-                  </Button>
+                  </ButtonWithTooltip>
                 </div>
                 {/* result */}
 
